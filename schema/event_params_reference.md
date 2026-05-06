@@ -54,22 +54,3 @@ the staging model.
 | `medium` | string_value | Acquisition medium at user level |
 
 ---
-
-## Common Gotchas
-
-**1. Never JOIN to unnest — it duplicates rows**
-```sql
--- Wrong
-JOIN UNNEST(event_params) p ON p.key = 'page_location'
-
--- Correct
-(SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'page_location')
-```
-
-**2. ga_session_id is not a top-level column**
-It lives inside event_params. Easy to miss if you're used to 
-other analytics schemas.
-
-**3. A key can return NULL even if it exists**
-If you extract a string_value but the key stores an int_value, 
-you get NULL silently — not an error. Always check the type column.

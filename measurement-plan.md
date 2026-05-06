@@ -75,13 +75,3 @@ for a travel eSIM product's data model.
 
 Drop-off rate is calculated between each consecutive step. 
 Segmented by: first_session_source, device_category, user_type.
-
----
-
-## 6. Known Limitations & Assumptions
-- Dataset is obfuscated; user_ids are not persistent across 
-  sessions in some cases
-- Revenue figures are approximate (sample data)
-- Custom events (Q3 above) are modeled analytically from 
-  existing event parameters, not from actual custom 
-  instrumentation

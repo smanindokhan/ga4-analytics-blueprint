@@ -1,0 +1,104 @@
+# models/schema.yml
+version: 2
+
+models:
+  - name: stg_events
+    description: >
+      Flattened GA4 event export. One row per event per session.
+      All nested event_params are unnested into flat columns.
+      This is the only model that touches the raw source directly.
+    columns:
+      - name: user_pseudo_id
+        description: Anonymous user identifier (cookie-based)
+        tests:
+          - not_null
+      - name: session_id
+        description: GA4 session identifier, extracted from event_params
+      - name: event_name
+        description: Name of the GA4 event
+        tests:
+          - not_null
+      - name: event_timestamp
+        description: Event timestamp converted from microseconds to TIMESTAMP
+        tests:
+          - not_null
+
+  - name: fct_sessions
+    description: >
+      Session-grain fact table. One row per user session.
+      Aggregates event counts, engagement metrics, and revenue
+      from stg_events. Foundation for funnel and retention models.
+    columns:
+      - name: session_id
+        description: GA4 session identifier
+        tests:
+          - not_null
+      - name: user_pseudo_id
+        description: Anonymous user identifier
+        tests:
+          - not_null
+      - name: is_converted_session
+        description: TRUE if session contained a purchase event
+      - name: session_revenue
+        description: Revenue attributed to this session (NULL if no purchase)
+
+  - name: fct_funnel
+    description: >
+      Funnel completion flags at session grain.
+      Each step column = 1 if the user reached that stage.
+      Used for funnel visualisation and drop-off analysis by channel.
+    columns:
+      - name: session_id
+        description: GA4 session identifier
+        tests:
+          - not_null
+      - name: step_1_session
+        description: Always 1 — anchors the funnel denominator
+      - name: step_2_viewed_item
+        description: 1 if session contained a view_item event
+      - name: step_3_added_to_cart
+        description: 1 if session contained an add_to_cart event
+      - name: step_4_began_checkout
+        description: 1 if session contained a begin_checkout event
+      - name: step_5_purchased
+        description: 1 if session contained a purchase event
+
+  - name: fct_retention
+    description: >
+      User-level cohort retention model.
+      Cohort defined by first session date.
+      Flags whether each user returned on Day 1, Day 7, and Day 30.
+    columns:
+      - name: user_pseudo_id
+        description: Anonymous user identifier
+        tests:
+          - not_null
+          - unique
+      - name: cohort_date
+        description: Date of user's first ever session
+        tests:
+          - not_null
+      - name: retained_day1
+        description: 1 if user had a session 1 day after first visit
+      - name: retained_day7
+        description: 1 if user had a session 6-8 days after first visit
+      - name: retained_day30
+        description: 1 if user had a session 28-32 days after first visit
+
+  - name: dim_users
+    description: >
+      User dimension table. One row per user.
+      Classifies users by purchase behaviour and computes
+      lifetime metrics. Used for revenue segmentation analysis.
+    columns:
+      - name: user_pseudo_id
+        description: Anonymous user identifier
+        tests:
+          - not_null
+          - unique
+      - name: purchase_segment
+        description: never_purchased / one_time_buyer / repeat_buyer
+      - name: user_type
+        description: new (1 session) / returning (2+ sessions)
+      - name: lifetime_revenue
+        description: Sum of all session revenue for this user

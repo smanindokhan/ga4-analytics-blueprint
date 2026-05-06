@@ -1,0 +1,23 @@
+# dbt compiled output — never commit these
+target/
+dbt_packages/
+logs/
+
+# dbt credentials — never commit
+profiles.yml
+
+# Python virtual environment
+dbt-env/
+__pycache__/
+*.pyc
+
+# BigQuery service account keys — if you ever use one
+*.json
+service_account*.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env

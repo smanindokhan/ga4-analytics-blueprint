@@ -24,7 +24,7 @@ cohort_joined AS (
         f.cohort_date,
         f.acquisition_source,
         a.session_date,
-        DATE_DIFF(a.session_date, f.cohort_date, DAY) AS days_since_first_visit
+        DATE_DIFF(PARSE_DATE('%Y%m%d', a.session_date), PARSE_DATE('%Y%m%d', f.cohort_date), DAY) AS days_since_first_visit
     FROM first_sessions f
     JOIN all_sessions a USING (user_pseudo_id)
 )

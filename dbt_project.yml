@@ -1,0 +1,20 @@
+# dbt_project.yml
+
+name: 'ga4_analytics_blueprint'
+version: '1.0.0'
+config-version: 2
+
+profile: 'ga4_analytics_blueprint' 
+
+model-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+docs-paths: ["docs"]
+
+target-path: "target"   
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  ga4_analytics_blueprint:
+    staging:
+      +materialized: view

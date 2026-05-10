@@ -1,4 +1,4 @@
-# GA4 Analytics Blueprint
+# GA4 Analytics Pipeline: dbt + BigQuery + Looker
 
 A complete end-to-end analytics system built on GA4 BigQuery exports. Demonstrates data modeling, transformation, and insight generation from raw event data to business-ready metrics.
 
